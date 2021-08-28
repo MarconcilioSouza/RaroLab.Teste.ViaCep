@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RaroLab.Teste.ViaCep.Model\RaroLab.Teste.ViaCep.Model.csproj" />
+    <ProjectReference Include="..\RaroLab.Teste.ViaCep.Service\RaroLab.Teste.ViaCep.Service.csproj" />
   </ItemGroup>
 
 
