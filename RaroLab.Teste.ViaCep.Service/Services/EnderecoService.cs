@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 using RaroLab.Teste.ViaCep.Model.Entidades;
-using RaroLab.Teste.ViaCep.Service.Interfaces;
+using RaroLab.Teste.ViaCep.Model.Interfaces;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -9,19 +9,19 @@ namespace RaroLab.Teste.ViaCep.Service.Services
 {
     public class EnderecoService : IEnderecoService
     {
-        public async Task<Cep> ObterCep(String numCep)
+        public async Task<Endereco> ObterCep(String numCep)
         {
-            Cep cepResult = new Cep();
+            Endereco endereco = new Endereco();
             using (var httpClient = new HttpClient())
             {
                 using (var response = await httpClient.GetAsync($"https://viacep.com.br/ws/{numCep}/json/"))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
-                    cepResult = JsonConvert.DeserializeObject<Cep>(apiResponse);
+                    endereco = JsonConvert.DeserializeObject<Endereco>(apiResponse);
                 }
             }
 
-            return cepResult;
+            return endereco;
         }
     }
 }

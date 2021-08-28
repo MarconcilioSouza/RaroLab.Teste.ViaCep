@@ -3,10 +3,10 @@ using System.Text.RegularExpressions;
 
 namespace RaroLab.Teste.ViaCep.Model.Entidades
 {
-    public class Cep
+    public class Endereco
     {
         [JsonProperty("cep")]
-        public string NumCep { get; set; }
+        public string cep { get; set; }
         [JsonProperty("logradouro")]
         public string Logradouro { get; set; }
         [JsonProperty("complemento")]
@@ -26,10 +26,18 @@ namespace RaroLab.Teste.ViaCep.Model.Entidades
         [JsonProperty("siafi")]
         public string Siafi { get; set; }
 
-        public static bool ValidaCEP(string numCep)
+        public static string ObterSomenteNumero(string numCep)
         {
-            Regex rgx = new Regex("^\\d{5}-?\\d{3}$");
-            return rgx.IsMatch(numCep);
+            string numerosCep = "";
+            var matches = Regex.Matches(numCep, @"\d+");
+            foreach (Match m in matches)
+                numerosCep = numerosCep + m.Value;
+
+            if (numerosCep.Length == 8)
+                return numerosCep;
+            else
+                return null;
+
         }
     }
 }

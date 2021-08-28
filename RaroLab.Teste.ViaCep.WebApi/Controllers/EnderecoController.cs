@@ -1,34 +1,62 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using RaroLab.Teste.ViaCep.Model.Entidades;
-using RaroLab.Teste.ViaCep.Service.Services;
+using RaroLab.Teste.ViaCep.Model.Interfaces;
+using System;
 using System.Threading.Tasks;
 
 namespace RaroLab.Teste.ViaCep.WebApi.Controllers
 {
+    /// <summary>
+    /// Api de endereços
+    /// </summary>
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/endereco")]
     public class EnderecoController : Controller
     {
-        public EnderecoController()
+        private readonly IEnderecoService _enderecoService;
+        private readonly IMemoryCache _cache;
+
+        public EnderecoController(IEnderecoService enderecoService, IMemoryCache cache)
         {
+            _cache = cache;
+            _enderecoService = enderecoService;
         }
 
         [HttpGet("{numCep}")]
         public async Task<IActionResult> Get(string numCep)
         {
-            if (Cep.ValidaCEP(numCep))
+            try
             {
-                EnderecoService enderecoService = new EnderecoService();
-                var cep = await enderecoService.ObterCep(numCep);
-                if (cep == null)
+                numCep = Endereco.ObterSomenteNumero(numCep);
+                Endereco endereco = null;
+
+                if (!string.IsNullOrEmpty(numCep))
                 {
-                    return NotFound("Dados do Cep não encontrado!");
+                    var cacheKey = string.Concat("getcep", numCep);
+                    if (!_cache.TryGetValue(cacheKey, out endereco))
+                    {
+                        endereco = await _enderecoService.ObterCep(numCep);
+
+                        if (endereco == null || string.IsNullOrEmpty(endereco.cep))
+                            return NotFound("Endereço não localizado!");
+
+                        var cacheOptions = new MemoryCacheEntryOptions()
+                            .SetSlidingExpiration(TimeSpan.FromSeconds(10))
+                            .SetAbsoluteExpiration(TimeSpan.FromSeconds(30));
+
+                        _cache.Set(cacheKey, endereco, cacheOptions);
+                    }
                 }
-                return Json(cep);
+                else
+                {
+                    return ValidationProblem("Cep inválido!");
+                }
+                return Json(endereco);
             }
-            else
+            catch
             {
-                return ValidationProblem("Cep inválido!");
+                return BadRequest("Erro interno!");
             }
         }
     }

@@ -1,15 +1,10 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using RaroLab.Teste.ViaCep.IoC;
+using RaroLab.Teste.ViaCep.WebApi.Configurations;
 
 namespace RaroLab.Teste.ViaCep.WebApi
 {
@@ -25,6 +20,14 @@ namespace RaroLab.Teste.ViaCep.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDependencyInjectionConfiguration();
+
+            // Swagger Config
+            services.AddSwaggerConfiguration();
+
+            // Ativando o uso de cache em memória
+            services.AddMemoryCache();
+
             services.AddControllers();
         }
 
@@ -42,10 +45,19 @@ namespace RaroLab.Teste.ViaCep.WebApi
 
             app.UseAuthorization();
 
+            app.UseCors(c =>
+            {
+                c.AllowAnyHeader();
+                c.AllowAnyMethod();
+                c.AllowAnyOrigin();
+            });
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
+
+            app.UseSwaggerSetup();
         }
     }
 }

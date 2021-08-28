@@ -2,10 +2,10 @@
 using System;
 using System.Threading.Tasks;
 
-namespace RaroLab.Teste.ViaCep.Service.Interfaces
+namespace RaroLab.Teste.ViaCep.Model.Interfaces
 {
     public interface IEnderecoService
     {
-        public Task<Cep> ObterCep(String numCep);
+        public Task<Endereco> ObterCep(String numCep);
     }
 }
